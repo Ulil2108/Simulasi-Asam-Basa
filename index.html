@@ -31,14 +31,6 @@
     opacity: 0.9;
   }
 
-  .warning {
-    display: none;
-    background: #ffcc00;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-  }
-
   .container {
     display: flex;
     justify-content: center;
@@ -50,9 +42,15 @@
   .panel {
     background: white;
     padding: 20px;
-    width: 260px;
+    width: 280px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
   }
 
   select {
@@ -63,13 +61,31 @@
   }
 
   .info {
-    margin-top: 12px;
+    margin: 12px 0;
     font-weight: bold;
     text-align: center;
     color: #0d47a1;
   }
 
-  /* ==== BEAKER ==== */
+  /* ===== LAKMUS (AWAL) ===== */
+  .lakmus-awal {
+    width: 30px;
+    height: 120px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    margin: 10px auto;
+    touch-action: none;
+  }
+
+  .red { background:red; }
+  .blue { background:blue; }
+
+  .label {
+    text-align: center;
+    font-size: 13px;
+  }
+
+  /* ===== BEAKER ===== */
   .beaker {
     width: 230px;
     height: 300px;
@@ -91,22 +107,7 @@
     border-top: 2px solid rgba(255,255,255,0.6);
   }
 
-  /* ==== LAKMUS ==== */
-  .lakmus {
-    width: 28px;
-    height: 120px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    touch-action: none;
-  }
-
-  .red { background:red; top: 20px; }
-  .blue { background:blue; top: 160px; }
-
-  /* Lakmus di gelas */
+  /* ===== LAKMUS DI GELAS ===== */
   .lakmus-gelas {
     position: absolute;
     left: 50%;
@@ -120,8 +121,10 @@
   }
 
   @media (max-width: 768px) {
-    .container { flex-direction: row; }
-    .warning { display:block; }
+    .container {
+      flex-direction: column;
+      align-items: center;
+    }
   }
 </style>
 </head>
@@ -133,15 +136,11 @@
   <p>SMAN MAPAT TUNGGUL SELATAN</p>
 </header>
 
-<div class="warning">
-  Untuk pengalaman terbaik, gunakan mode <b>LANDSCAPE</b> 🔄
-</div>
-
 <div class="container">
 
-  <!-- KONTROL -->
+  <!-- PANEL KONTROL -->
   <div class="panel">
-    <label>Pilih Larutan</label>
+    <label>Pilih larutan</label>
     <select id="zat" onchange="gantiZat()">
       <option value="H2O">Air (H₂O)</option>
       <option value="HCl">HCl – Asam kuat</option>
@@ -152,79 +151,80 @@
     </select>
 
     <div class="info">
-      pH = <span id="ph">7</span>
+      pH = <span id="phValue">7</span>
+    </div>
+
+    <div id="panelLakmus">
+      <div id="lakmusRed" class="lakmus-awal red"></div>
+      <div class="label">Lakmus Merah</div>
+
+      <div id="lakmusBlue" class="lakmus-awal blue"></div>
+      <div class="label">Lakmus Biru</div>
     </div>
   </div>
 
-  <!-- SIMULASI -->
+  <!-- PANEL SIMULASI -->
   <div class="panel">
     <div class="beaker" id="beaker">
       <div class="liquid"></div>
-
-      <div class="lakmus-gelas" id="lakmusGelas"></div>
+      <div id="lakmusGelas" class="lakmus-gelas"></div>
     </div>
-
-    <div class="lakmus red" id="lakmusRed"></div>
-    <div class="lakmus blue" id="lakmusBlue"></div>
   </div>
+
 </div>
 
 <script>
-  const data = {
-    HCl:{pH:1,sifat:"asam"},
-    HNO3:{pH:1,sifat:"asam"},
-    CH3COOH:{pH:3,sifat:"asam"},
-    NaOH:{pH:13,sifat:"basa"},
-    NH3:{pH:10,sifat:"basa"},
-    H2O:{pH:7,sifat:"netral"}
+  const dataZat = {
+    HCl:{pH:1,sifat:'asam'},
+    HNO3:{pH:1,sifat:'asam'},
+    CH3COOH:{pH:3,sifat:'asam'},
+    NaOH:{pH:13,sifat:'basa'},
+    NH3:{pH:10,sifat:'basa'},
+    H2O:{pH:7,sifat:'netral'}
   };
 
   let zatAktif="H2O";
 
   function gantiZat(){
     zatAktif=zat.value;
-    ph.innerText=data[zatAktif].pH;
-    lakmusGelas.style.display="none";
+    phValue.textContent=dataZat[zatAktif].pH;
+    resetLakmus();
   }
 
-  function enableDrag(el, warna){
+  function enablePointerLakmus(el, warna){
     el.addEventListener("pointerdown",(e)=>{
       el.setPointerCapture(e.pointerId);
 
-      function move(ev){
-        el.style.left=ev.clientX+"px";
-        el.style.top=ev.clientY+"px";
-      }
-
       function up(){
-        cekCelup(warna);
-        document.removeEventListener("pointermove",move);
+        pindahKeGelas(warna);
         document.removeEventListener("pointerup",up);
       }
 
-      document.addEventListener("pointermove",move);
       document.addEventListener("pointerup",up);
     });
   }
 
-  function cekCelup(warna){
-    const sifat=data[zatAktif].sifat;
+  function pindahKeGelas(warna){
+    panelLakmus.style.display="none";
+
     lakmusGelas.style.display="block";
     lakmusGelas.style.background=warna;
 
-    if(warna==="red" && sifat==="basa"){
-      lakmusGelas.style.background="blue";
-    }
-    if(warna==="blue" && sifat==="asam"){
-      lakmusGelas.style.background="red";
-    }
+    const sifat=dataZat[zatAktif].sifat;
+    if(warna==="red" && sifat==="basa") lakmusGelas.style.background="blue";
+    if(warna==="blue" && sifat==="asam") lakmusGelas.style.background="red";
   }
 
-  enableDrag(lakmusRed,"red");
-  enableDrag(lakmusBlue,"blue");
+  function resetLakmus(){
+    panelLakmus.style.display="block";
+    lakmusGelas.style.display="none";
+  }
+
+  enablePointerLakmus(lakmusRed,"red");
+  enablePointerLakmus(lakmusBlue,"blue");
+
   gantiZat();
 </script>
 
 </body>
 </html>
-``
