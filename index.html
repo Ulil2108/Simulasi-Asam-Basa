@@ -67,9 +67,13 @@
     color: #0d47a1;
   }
 
-  /* ===== LAKMUS (AWAL) ===== */
-  .lakmus-awal {
-    width: 30px;
+  /* ===== LAKMUS DI PANEL ===== */
+  .lakmus-panel {
+    margin-top: 10px;
+  }
+
+  .lakmus {
+    width: 28px;
     height: 120px;
     border: 1px solid #333;
     border-radius: 5px;
@@ -107,7 +111,7 @@
     border-top: 2px solid rgba(255,255,255,0.6);
   }
 
-  /* ===== LAKMUS DI GELAS ===== */
+  /* ===== LAKMUS DI GELAS (HASIL) ===== */
   .lakmus-gelas {
     position: absolute;
     left: 50%;
@@ -117,7 +121,13 @@
     height: 110px;
     border: 1px solid #333;
     display: none;
-    z-index: 10;
+  }
+
+  /* ===== LAKMUS GHOST (YANG DIGESER) ===== */
+  .lakmus-ghost {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
   }
 
   @media (max-width: 768px) {
@@ -150,15 +160,13 @@
       <option value="NH3">NH₃ – Basa lemah</option>
     </select>
 
-    <div class="info">
-      pH = <span id="phValue">7</span>
-    </div>
+    <div class="info">pH = <span id="phValue">7</span></div>
 
-    <div id="panelLakmus">
-      <div id="lakmusRed" class="lakmus-awal red"></div>
+    <div class="lakmus-panel">
+      <div class="lakmus red" id="red"></div>
       <div class="label">Lakmus Merah</div>
 
-      <div id="lakmusBlue" class="lakmus-awal blue"></div>
+      <div class="lakmus blue" id="blue"></div>
       <div class="label">Lakmus Biru</div>
     </div>
   </div>
@@ -184,47 +192,62 @@
   };
 
   let zatAktif="H2O";
+  let ghost = null;
 
   function gantiZat(){
     zatAktif=zat.value;
     phValue.textContent=dataZat[zatAktif].pH;
-    resetLakmus();
+    lakmusGelas.style.display="none";
   }
 
-  function enablePointerLakmus(el, warna){
+  function aktifkanLakmus(el, warna){
     el.addEventListener("pointerdown",(e)=>{
-      el.setPointerCapture(e.pointerId);
+      // buat ghost
+      ghost = el.cloneNode(true);
+      ghost.classList.add("lakmus-ghost");
+      document.body.appendChild(ghost);
 
-      function up(){
-        pindahKeGelas(warna);
+      function move(ev){
+        ghost.style.left = (ev.clientX - 14)+"px";
+        ghost.style.top  = (ev.clientY - 60)+"px";
+      }
+
+      function up(ev){
+        const rect = beaker.getBoundingClientRect();
+        if(
+          ev.clientX > rect.left &&
+          ev.clientX < rect.right &&
+          ev.clientY > rect.top &&
+          ev.clientY < rect.bottom
+        ){
+          tampilkanLakmusGelas(warna);
+        }
+        ghost.remove();
+        ghost = null;
+        document.removeEventListener("pointermove",move);
         document.removeEventListener("pointerup",up);
       }
 
+      document.addEventListener("pointermove",move);
       document.addEventListener("pointerup",up);
     });
   }
 
-  function pindahKeGelas(warna){
-    panelLakmus.style.display="none";
-
+  function tampilkanLakmusGelas(warna){
+    const sifat = dataZat[zatAktif].sifat;
     lakmusGelas.style.display="block";
-    lakmusGelas.style.background=warna;
+    lakmusGelas.style.background = warna;
 
-    const sifat=dataZat[zatAktif].sifat;
     if(warna==="red" && sifat==="basa") lakmusGelas.style.background="blue";
     if(warna==="blue" && sifat==="asam") lakmusGelas.style.background="red";
   }
 
-  function resetLakmus(){
-    panelLakmus.style.display="block";
-    lakmusGelas.style.display="none";
-  }
-
-  enablePointerLakmus(lakmusRed,"red");
-  enablePointerLakmus(lakmusBlue,"blue");
+  aktifkanLakmus(red,"red");
+  aktifkanLakmus(blue,"blue");
 
   gantiZat();
 </script>
 
 </body>
 </html>
+``
