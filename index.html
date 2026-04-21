@@ -1,162 +1,129 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Simulasi Virtual Asam Basa</title>
+<title>Simulasi Virtual Asam Basa</title>
 
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #ffffff);
-      margin: 0;
-      padding: 0;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#e3f2fd,#ffffff);
+  }
 
-    /* ===== HEADER ===== */
-    header {
-      background: #0d47a1;
-      color: white;
-      padding: 16px 10px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+  header {
+    background: #0d47a1;
+    color: white;
+    text-align: center;
+    padding: 12px;
+  }
 
-    header h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: 1px;
-    }
+  header h1 {
+    margin: 0;
+    font-size: 18px;
+  }
 
-    header p {
-      margin: 4px 0 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
+  header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+  }
 
-    /* ===== LAYOUT ===== */
-    .container {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      padding: 20px;
-      flex-wrap: wrap;
-    }
+  .warning {
+    display: none;
+    background: #ffcc00;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+  }
 
-    .panel {
-      background: white;
-      padding: 20px;
-      width: 280px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    }
+  .container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
 
-    /* ===== SELECT ZAT ===== */
-    label {
-      font-weight: bold;
-      margin-bottom: 6px;
-      display: block;
-    }
+  .panel {
+    background: white;
+    padding: 20px;
+    width: 260px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
 
-    select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-      background: linear-gradient(135deg, #ffffff, #f1f8ff);
-      cursor: pointer;
-    }
+  select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
 
-    .info {
-      margin-top: 12px;
-      font-size: 16px;
-      text-align: center;
-      font-weight: bold;
-      color: #0d47a1;
-    }
+  .info {
+    margin-top: 12px;
+    font-weight: bold;
+    text-align: center;
+    color: #0d47a1;
+  }
 
-    /* ===== BUTTON ===== */
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 10px;
-      background: #1976d2;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+  /* ==== BEAKER ==== */
+  .beaker {
+    width: 230px;
+    height: 300px;
+    border: 5px solid #555;
+    border-top: none;
+    border-radius: 0 0 30px 30px;
+    background: #f8fbff;
+    position: relative;
+    margin: auto;
+    overflow: hidden;
+  }
 
-    button:hover {
-      background: #0d47a1;
-    }
+  .liquid {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 75%;
+    background: rgba(180,220,255,0.25);
+    border-top: 2px solid rgba(255,255,255,0.6);
+  }
 
-    /* ===== BEAKER ===== */
-    .beaker {
-      width: 220px;
-      height: 300px;
-      border: 5px solid #555;
-      border-top: none;
-      border-radius: 0 0 30px 30px;
-      position: relative;
-      background: #f8fbff;
-      margin: auto;
-      overflow: hidden;
-    }
+  /* ==== LAKMUS ==== */
+  .lakmus {
+    width: 28px;
+    height: 120px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    touch-action: none;
+  }
 
-    .liquid {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 75%;
-      background: rgba(180,220,255,0.25);
-      border-top: 2px solid rgba(255,255,255,0.7);
-    }
+  .red { background:red; top: 20px; }
+  .blue { background:blue; top: 160px; }
 
-    /* ===== LAKMUS TOOL ===== */
-    .lakmus-tool {
-      width: 30px;
-      height: 120px;
-      border: 1px solid #333;
-      border-radius: 5px;
-      margin: 14px auto;
-      cursor: grab;
-    }
+  /* Lakmus di gelas */
+  .lakmus-gelas {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 110px;
+    border: 1px solid #333;
+    display: none;
+    z-index: 10;
+  }
 
-    .red { background: red; }
-    .blue { background: blue; }
-
-    .label {
-      text-align: center;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    /* ===== LAKMUS DI GELAS ===== */
-    .lakmus-botol {
-      position: absolute;
-      left: 50%;
-      top: 25%;
-      transform: translateX(-50%);
-      width: 22px;
-      height: 110px;
-      border: 1px solid #333;
-      display: none;
-      z-index: 10;
-    }
-
-    /* ===== RESPONSIVE HP ===== */
-    @media (max-width: 720px) {
-      .container {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-  </style>
+  @media (max-width: 768px) {
+    .container { flex-direction: row; }
+    .warning { display:block; }
+  }
+</style>
 </head>
 
 <body>
@@ -166,113 +133,98 @@
   <p>SMAN MAPAT TUNGGUL SELATAN</p>
 </header>
 
+<div class="warning">
+  Untuk pengalaman terbaik, gunakan mode <b>LANDSCAPE</b> 🔄
+</div>
+
 <div class="container">
 
-  <!-- PANEL KONTROL -->
+  <!-- KONTROL -->
   <div class="panel">
-    <label>Pilih larutan</label>
+    <label>Pilih Larutan</label>
     <select id="zat" onchange="gantiZat()">
-      <option value="H2O">Air (H₂O) – Netral</option>
-
+      <option value="H2O">Air (H₂O)</option>
       <option value="HCl">HCl – Asam kuat</option>
       <option value="HNO3">HNO₃ – Asam kuat</option>
       <option value="CH3COOH">CH₃COOH – Asam lemah</option>
-
       <option value="NaOH">NaOH – Basa kuat</option>
-      <option value="KOH">KOH – Basa kuat</option>
       <option value="NH3">NH₃ – Basa lemah</option>
     </select>
 
     <div class="info">
-      pH = <span id="phValue">7</span>
+      pH = <span id="ph">7</span>
     </div>
-
-    <!-- MODE HP (TAP) -->
-    <button onclick="celupkanLakmus('red')">Celupkan Lakmus Merah</button>
-    <button onclick="celupkanLakmus('blue')">Celupkan Lakmus Biru</button>
-
-    <button onclick="resetSimulasi()">Reset</button>
-
-    <!-- MODE DESKTOP (DRAG) -->
-    <div draggable="true" class="lakmus-tool red" id="red" ondragstart="drag(event)"></div>
-    <div class="label">Lakmus Merah (Drag di Laptop)</div>
-
-    <div draggable="true" class="lakmus-tool blue" id="blue" ondragstart="drag(event)"></div>
-    <div class="label">Lakmus Biru (Drag di Laptop)</div>
   </div>
 
-  <!-- PANEL SIMULASI -->
+  <!-- SIMULASI -->
   <div class="panel">
-    <div class="beaker">
-      <div class="liquid"
-           ondragover="event.preventDefault()"
-           ondrop="dropLakmus(event)">
-      </div>
+    <div class="beaker" id="beaker">
+      <div class="liquid"></div>
 
-      <div class="lakmus-botol" id="lakmusBotol"></div>
+      <div class="lakmus-gelas" id="lakmusGelas"></div>
     </div>
-  </div>
 
+    <div class="lakmus red" id="lakmusRed"></div>
+    <div class="lakmus blue" id="lakmusBlue"></div>
+  </div>
 </div>
 
 <script>
-  const dataZat = {
-    HCl: { pH: 1, sifat: "asam" },
-    HNO3: { pH: 1, sifat: "asam" },
-    CH3COOH: { pH: 3, sifat: "asam" },
-
-    NaOH: { pH: 13, sifat: "basa" },
-    KOH: { pH: 13, sifat: "basa" },
-    NH3: { pH: 10, sifat: "basa" },
-
-    H2O: { pH: 7, sifat: "netral" }
+  const data = {
+    HCl:{pH:1,sifat:"asam"},
+    HNO3:{pH:1,sifat:"asam"},
+    CH3COOH:{pH:3,sifat:"asam"},
+    NaOH:{pH:13,sifat:"basa"},
+    NH3:{pH:10,sifat:"basa"},
+    H2O:{pH:7,sifat:"netral"}
   };
 
-  let zatAktif = "H2O";
+  let zatAktif="H2O";
 
-  function gantiZat() {
-    zatAktif = zat.value;
-    phValue.textContent = dataZat[zatAktif].pH;
-    resetSimulasi();
+  function gantiZat(){
+    zatAktif=zat.value;
+    ph.innerText=data[zatAktif].pH;
+    lakmusGelas.style.display="none";
   }
 
-  function drag(ev) {
-    ev.dataTransfer.setData("warna", ev.target.id);
+  function enableDrag(el, warna){
+    el.addEventListener("pointerdown",(e)=>{
+      el.setPointerCapture(e.pointerId);
+
+      function move(ev){
+        el.style.left=ev.clientX+"px";
+        el.style.top=ev.clientY+"px";
+      }
+
+      function up(){
+        cekCelup(warna);
+        document.removeEventListener("pointermove",move);
+        document.removeEventListener("pointerup",up);
+      }
+
+      document.addEventListener("pointermove",move);
+      document.addEventListener("pointerup",up);
+    });
   }
 
-  function dropLakmus(ev) {
-    ev.preventDefault();
-    const warna = ev.dataTransfer.getData("warna");
-    tampilkanLakmus(warna);
-  }
+  function cekCelup(warna){
+    const sifat=data[zatAktif].sifat;
+    lakmusGelas.style.display="block";
+    lakmusGelas.style.background=warna;
 
-  function celupkanLakmus(warna) {
-    tampilkanLakmus(warna);
-  }
-
-  function tampilkanLakmus(warna) {
-    const sifat = dataZat[zatAktif].sifat;
-    lakmusBotol.style.display = "block";
-    lakmusBotol.style.background = warna;
-
-    if (warna === "red" && sifat === "basa") {
-      lakmusBotol.style.background = "blue";
+    if(warna==="red" && sifat==="basa"){
+      lakmusGelas.style.background="blue";
     }
-    if (warna === "blue" && sifat === "asam") {
-      lakmusBotol.style.background = "red";
+    if(warna==="blue" && sifat==="asam"){
+      lakmusGelas.style.background="red";
     }
   }
 
-  function resetSimulasi() {
-    lakmusBotol.style.display = "none";
-  }
-
-  const zat = document.getElementById("zat");
-  const phValue = document.getElementById("phValue");
-  const lakmusBotol = document.getElementById("lakmusBotol");
-
+  enableDrag(lakmusRed,"red");
+  enableDrag(lakmusBlue,"blue");
   gantiZat();
 </script>
 
 </body>
 </html>
+``
